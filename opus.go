@@ -13,6 +13,9 @@ import (
 #cgo linux,!android,musl,arm LDFLAGS: ${SRCDIR}/lib/libopus.musl.arm.a
 #cgo linux,!android,musl,arm64 LDFLAGS: ${SRCDIR}/lib/libopus.musl.aarch64.a
 #cgo linux,!android,musl,amd64 LDFLAGS: ${SRCDIR}/lib/libopus.musl.x86_64.a
+#cgo android,arm LDFLAGS: ${SRCDIR}/lib/libopus.android.a
+#cgo android,arm64 LDFLAGS: ${SRCDIR}/lib/libopus.android.a
+#cgo android,amd64 LDFLAGS: ${SRCDIR}/lib/libopus.android.a
 #cgo ios,arm64,mobile LDFLAGS: ${SRCDIR}/lib/libopus.ios.arm64.a -framework Accelerate
 #cgo ios,amd64,mobile LDFLAGS: ${SRCDIR}/lib/libopus.ios.simulator.x86_64.a -framework Accelerate
 #cgo darwin,arm64,!mobile LDFLAGS: ${SRCDIR}/lib/libopus.macos.arm64.a -framework Accelerate
