@@ -1,3 +1,5 @@
+// Copyright (2021) Cobalt Speech and Language Inc.
+
 package go_opus
 
 import (

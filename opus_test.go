@@ -1,11 +1,82 @@
+// Copyright (2021) Cobalt Speech and Language Inc.
+
 package go_opus
 
 import (
+	"bufio"
+	"bytes"
+	"encoding/binary"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 )
+
+//play -t raw -r 16000 -b 16 -e signed-integer ./output.pcm
+func TestOpusFile(t *testing.T) {
+	files, err := ioutil.ReadDir("./samples")
+	if err != nil {
+		t.Error(err)
+	}
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].Name() < files[j].Name()
+	})
+	channels := 1
+	sampleRate := 16000
+	frame := 320
+	decoder, err := NewDecoder(sampleRate, channels)
+	if err != nil {
+		t.Errorf("Create decoder error %v", err)
+	}
+	outBuffer := make([]int16, frame)
+	if err != nil {
+		t.Error(err)
+	}
+	outF, err := os.Create("output.pcm")
+	if err != nil {
+		t.Error(err)
+	}
+	w := bufio.NewWriter(outF)
+	defer outF.Close()
+	outBytesCount := 0
+	for _, f := range files {
+
+		fileName := f.Name()
+		bytes, err := ioutil.ReadFile("./samples/" + fileName)
+		if err != nil {
+			t.Error(err)
+		}
+		count, err := decoder.Decode(bytes, outBuffer)
+		outBytesCount += count
+		if err != nil {
+			t.Errorf("Decode error %v", err)
+		}
+		if count != frame {
+			t.Errorf("Frame is not valid: %v!=%v", count, frame)
+		}
+		err = binary.Write(w, binary.LittleEndian, outBuffer)
+		if err != nil {
+			t.Errorf("Write to file error %v", err)
+		}
+
+	}
+	t.Logf("out size: %d", outBytesCount)
+	origFile, err := ioutil.ReadFile("output_orig.pcm")
+	if err != nil {
+		t.Error(err)
+	}
+	outputFile, err := ioutil.ReadFile("output.pcm")
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !bytes.Equal(origFile, outputFile) {
+		t.Error("Files not equal")
+	}
+}
 
 func TestOpusDecoder(t *testing.T) {
 	channels := 1
